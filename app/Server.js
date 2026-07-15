@@ -171,13 +171,29 @@ function callLLM(opts, messages, maxTokens) {
       let data = '';
       res.on('data', c => data += c);
       res.on('end', () => {
+        // Non-2xx: surface the real status + raw body instead of trying to parse it as a normal reply
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          const snippet = data.slice(0, 500).replace(/\s+/g, ' ').trim();
+          return reject(new Error(`[${provider}] HTTP ${res.statusCode} from ${cfg.hostname}${cfg.path} — ${snippet || '(empty response body)'}`));
+        }
+        let parsed;
         try {
-          const parsed = JSON.parse(data);
+          parsed = JSON.parse(data);
+        } catch(e) {
+          const snippet = data.slice(0, 300).replace(/\s+/g, ' ').trim();
+          return reject(new Error(`[${provider}] Response wasn't valid JSON (status ${res.statusCode}). Raw response: ${snippet || '(empty)'}`));
+        }
+        try {
           resolve(cfg.parseResponse(parsed));
-        } catch(e) { reject(e); }
+        } catch(e) {
+          reject(new Error(`[${provider}] ${e.message || 'Unexpected response shape'} — raw: ${JSON.stringify(parsed).slice(0,300)}`));
+        }
       });
     });
-    req.on('error', reject);
+    req.on('error', e => reject(new Error(`[${provider}] Connection error to ${cfg.hostname}: ${e.message}`)));
+    req.setTimeout(60000, () => {
+      req.destroy(new Error(`[${provider}] Request to ${cfg.hostname} timed out after 60s — check the base URL/network.`));
+    });
     req.write(body);
     req.end();
   });

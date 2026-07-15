@@ -643,9 +643,18 @@ async function generate(){
       body:JSON.stringify(config)
     });
 
+    if(!res.ok){
+      addLog('done-err',`Error: server responded ${res.status} ${res.statusText}`);
+      setStatus('Error — check Log');
+      btn.disabled=false; btn.textContent='Generate';
+      return;
+    }
+
     const reader=res.body.getReader();
     const decoder=new TextDecoder();
     let buffer='';
+    let gotAnyEvent=false;
+    let finished=false;
 
     while(true){
       const {done,value}=await reader.read();
@@ -657,8 +666,10 @@ async function generate(){
         if(line.startsWith('data: ')){
           try{
             const msg=JSON.parse(line.slice(6));
+            gotAnyEvent=true;
             if(msg.type==='log') addLog('',msg.data);
             if(msg.type==='done'){
+              finished=true;
               if(msg.data.success){
                 addLog('done-ok','');
                 addLog('done-ok','All done! Files: '+msg.data.files.join(', '));
@@ -667,13 +678,24 @@ async function generate(){
                 await loadOutputs();
                 setStatus('Done! Check Preview tab.');
               }else{
-                addLog('done-err','Error: '+msg.data.error);
+                addLog('done-err','Error: '+(msg.data.error||'(no error message returned)'));
                 setStatus('Error — check Log');
               }
             }
-          }catch(e){}
+          }catch(e){
+            addLog('done-err','Warning: received malformed data from server: '+line.slice(0,200));
+          }
         }
       }
+    }
+
+    if(!finished){
+      if(!gotAnyEvent){
+        addLog('done-err','Error: connection closed with no response from the server. Check that Server.js is running, and that your provider/base URL is reachable.');
+      }else{
+        addLog('done-err','Error: connection closed unexpectedly before generation finished.');
+      }
+      setStatus('Error — check Log');
     }
   }catch(err){
     addLog('done-err','Error: '+err.message);
