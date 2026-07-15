@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onlinekey.me — Content Generator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#0D78F2;--blue2:#006AA9;--bg:#f5f7fa;--surface:#fff;
+  --border:#e5e7eb;--text:#1a1a1a;--muted:#888;--sub:#555;
+  --success:#22c55e;--error:#ef4444;--warn:#f59e0b;
+  --radius:10px;--radius-sm:6px;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;flex-shrink:0}
+.logo{font-weight:700;font-size:16px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.logo-badge{font-size:11px;background:#EEF5FF;color:var(--blue);padding:3px 10px;border-radius:20px;border:1px solid #c7dcfe;font-weight:400}
+.header-actions{margin-left:auto;display:flex;gap:8px}
+.hbtn{font-size:12px;padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--sub);cursor:pointer;transition:all .15s}
+.hbtn:hover{background:var(--surface);color:var(--text)}
+.hbtn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.hbtn.primary:hover{background:var(--blue2)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:340px 1fr;flex:1;min-height:0;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.sb-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:14px}
+.sb-footer{padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0}
+
+/* FIELD */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.field input,.field select,.field textarea{font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);outline:none;font-family:inherit;width:100%;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue)}
+.field textarea{resize:vertical;line-height:1.5}
+.field input[type=color]{height:36px;padding:2px 4px;cursor:pointer}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* SECTION TITLE */
+.sec-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+
+/* MODE TOGGLE */
+.mode-row{display:flex;gap:6px}
+.mode-btn{flex:1;padding:9px 8px;font-size:12px;font-weight:600;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;text-align:center;transition:all .15s}
+.mode-btn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.mode-btn:hover:not(.on){background:var(--surface);color:var(--text)}
+
+/* URL INPUTS */
+.url-row{display:flex;gap:6px}
+.url-input{flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);outline:none;font-family:inherit}
+.url-input:focus{border-color:var(--blue)}
+.url-add-btn{padding:7px 12px;font-size:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;flex-shrink:0;transition:all .15s}
+.url-add-btn:hover{border-color:var(--blue);color:var(--blue)}
+.url-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.url-tag{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px}
+.url-tag span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
+.url-rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;line-height:1}
+.url-rm:hover{color:var(--error)}
+
+/* STRUCTURE */
+.preset-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:10px}
+.preset-btn{padding:8px 6px;font-size:11px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;text-align:left;line-height:1.4;width:100%;transition:all .15s}
+.preset-btn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.preset-btn:hover:not(.on){border-color:var(--blue);color:var(--text)}
+.pname{font-weight:600;display:block;margin-bottom:2px}
+.pdesc{font-size:10px;opacity:.75;display:block}
+.builder-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.col-title{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.drop-zone{min-height:60px;border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:5px;background:var(--bg);transition:all .15s}
+.drop-zone.over{border-color:var(--blue);background:#EEF5FF}
+.sec-chip{display:flex;align-items:center;gap:5px;font-size:11px;padding:5px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface);cursor:grab;margin-bottom:3px;color:var(--text);user-select:none;transition:border-color .15s}
+.sec-chip:last-child{margin-bottom:0}
+.sec-chip:hover{border-color:var(--blue)}
+.sec-chip.dragging{opacity:.3}
+.sec-chip.act{border-color:var(--blue);background:#EEF5FF}
+.drag-h{color:var(--muted);font-size:12px;flex-shrink:0}
+.chip-lbl{flex:1}
+.chip-tog{background:none;border:none;font-size:12px;cursor:pointer;color:var(--muted);padding:0;line-height:1}
+.chip-tog:hover{color:var(--text)}
+.zone-hint{font-size:11px;color:var(--muted);text-align:center;padding:8px;opacity:.6}
+
+/* RICH FEATURES */
+.rich-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.ri{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);cursor:pointer;color:var(--muted);transition:all .15s}
+.ri:hover{border-color:var(--blue);color:var(--text)}
+.ri input{accent-color:var(--blue)}
+
+/* GENERATE BUTTON */
+.gen-btn{width:100%;padding:13px;background:var(--blue);border:none;border-radius:var(--radius-sm);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gen-btn:hover:not(:disabled){background:var(--blue2)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
+.gen-status{font-size:12px;color:var(--muted);margin-top:6px;min-height:18px;text-align:center}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 20px;flex-shrink:0;overflow-x:auto}
+.tab{padding:12px 14px;font-size:13px;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);white-space:nowrap;transition:color .15s}
+.tab:hover:not(.on){color:var(--text)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.panel{display:none;flex:1;overflow:auto;flex-direction:column}
+.panel.on{display:flex}
+
+/* PREVIEW */
+.preview-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.preview-bar span{font-size:12px;color:var(--muted);margin-left:auto}
+iframe#preview{flex:1;border:none;background:#fff}
+
+/* LOG */
+.log-area{flex:1;overflow-y:auto;padding:16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;background:#1e1e2e;color:#cdd6f4}
+.log-line{margin-bottom:2px}
+.log-line.done-ok{color:#a6e3a1}
+.log-line.done-err{color:#f38ba8}
+.log-line.info{color:#89b4fa}
+
+/* COPY */
+.copy-content{flex:1;overflow:auto;padding:24px;font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--text);font-family:inherit}
+
+/* OUTPUTS */
+.outputs-list{padding:16px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1}
+.output-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .15s}
+.output-card:hover{border-color:var(--blue)}
+.output-icon{font-size:24px;flex-shrink:0}
+.output-info{flex:1;min-width:0}
+.output-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.output-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.output-actions{display:flex;gap:6px;flex-shrink:0}
+.obtn{font-size:11px;padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--sub);cursor:pointer;transition:all .15s}
+.obtn:hover{background:var(--surface);color:var(--blue);border-color:var(--blue)}
+
+/* PLACEHOLDER */
+.ph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--muted)}
+.ph-icon{font-size:48px;opacity:.2}
+.ph h2{font-size:15px;color:var(--sub)}
+.ph p{font-size:13px;text-align:center;max-width:340px;line-height:1.6}
+
+/* PRODUCT LIBRARY */
+.lib-list{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1;overflow-y:auto}
+.lib-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:border-color .15s;display:flex;align-items:center;gap:10px}
+.lib-card:hover{border-color:var(--blue)}
+.lib-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.lib-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.lib-price{font-size:12px;color:var(--blue);font-weight:600;flex-shrink:0}
+.lib-load{font-size:11px;padding:4px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;flex-shrink:0}
+.lib-load:hover{border-color:var(--blue);color:var(--blue)}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--text);border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;color:#fff;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:999}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">✦ Content Generator <span class="logo-badge">onlinekey.me</span></div>
+  <div class="header-actions">
+    <button class="hbtn" onclick="swMainTab('outputs',this)" id="hbtn-outputs">📁 Outputs</button>
+    <button class="hbtn" onclick="swMainTab('library',this)" id="hbtn-library">📚 Product Library</button>
+    <button class="hbtn" onclick="swMainTab('log',this)" id="hbtn-log">📋 Log</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-body">
+
+      <!-- PROVIDER -->
+      <div class="field">
+        <label>🧠 AI Provider</label>
+        <select id="f-provider" onchange="onProviderChange()" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px">
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+          <option value="custom">Custom (OpenAI-compatible)</option>
+        </select>
+      </div>
+
+      <!-- API KEY -->
+      <div class="field">
+        <label id="f-apikey-label">🔑 Anthropic API Key</label>
+        <div style="display:flex;gap:6px">
+          <input type="password" id="f-apikey" placeholder="sk-ant-api03-..." autocomplete="off" style="flex:1;font-family:monospace;font-size:12px">
+          <button onclick="toggleKey()" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);cursor:pointer;font-size:14px;flex-shrink:0" title="Show/hide">👁</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px" id="f-apikey-hint">Get at <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> — $5 = ~100 pages</div>
+      </div>
+
+      <!-- MODEL (optional override) -->
+      <div class="field" id="f-model-wrap">
+        <label>Model <span style="color:var(--muted);font-weight:400">(optional override)</span></label>
+        <input type="text" id="f-model" placeholder="leave blank for default" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px">
+      </div>
+
+      <!-- BASE URL (custom provider only) -->
+      <div class="field" id="f-baseurl-wrap" style="display:none">
+        <label>Base URL</label>
+        <input type="text" id="f-baseurl" placeholder="https://your-endpoint.example.com" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace">
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">Only point this at an OpenAI-compatible endpoint you have a real, legitimate account with (Azure OpenAI, your own self-hosted server, etc). Assumes a standard <code>/chat/completions</code> API shape.</div>
+      </div>
+
+      <!-- MODE -->
+      <div>
+        <div class="sec-title">Mode</div>
+        <div class="mode-row">
+          <div class="mode-btn on" id="m-desc" onclick="setMode('desc')">📝 Description</div>
+          <div class="mode-btn" id="m-landing" onclick="setMode('landing')">🖥 Landing Page</div>
+        </div>
+      </div>
+
+      <!-- PRODUCT -->
+      <div class="field">
+        <label>Product name</label>
+        <textarea id="f-product" rows="2" placeholder="Adobe Acrobat Pro | PDF Software | For Windows 1-Device Lifetime"></textarea>
+      </div>
+
+      <!-- SOURCE URLs -->
+      <div>
+        <div class="sec-title">Source URLs <span style="font-size:10px;color:var(--blue);background:#EEF5FF;padding:1px 7px;border-radius:20px;font-weight:400">auto-fetched</span></div>
+        <div class="url-row">
+          <input type="url" class="url-input" id="url-inp" placeholder="https://www.adobe.com/acrobat/...">
+          <button class="url-add-btn" onclick="addUrl()">+ Add</button>
+        </div>
+        <div class="url-list" id="url-list"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">Claude Code fetches these and extracts real features, specs, FAQ, and headlines.</div>
+      </div>
+
+      <!-- OPTIONS -->
+      <div class="opts-grid">
+        <div class="field"><label>Product color</label><input type="color" id="f-color" value="#FF0000"></div>
+        <div class="field"><label>Price ($)</label><input type="text" id="f-price" placeholder="50.99"></div>
+        <div class="field"><label>Original price</label><input type="text" id="f-orig" placeholder="239.99"></div>
+        <div class="field"><label>CTA button</label>
+          <select id="f-cta">
+            <option>Buy Now</option><option>Get Started Free</option>
+            <option>Download</option><option>Request Demo</option>
+          </select>
+        </div>
+        <div class="field"><label>Language</label>
+          <select id="f-lang">
+            <option>English</option><option>French</option>
+            <option>Arabic</option><option>Spanish</option>
+            <option>German</option><option>Portuguese</option>
+          </select>
+        </div>
+        <div class="field"><label>Tone</label>
+          <select id="f-tone">
+            <option value="professional">Professional</option>
+            <option value="persuasive">Persuasive</option>
+            <option value="friendly">Friendly</option>
+            <option value="urgent with FOMO">Urgent / FOMO</option>
+            <option value="technical">Technical</option>
+            <option value="luxury">Luxury</option>
+          </select>
+        </div>
+        <div class="field"><label>Audience</label>
+          <select id="f-aud">
+            <option value="general consumers">General</option>
+            <option value="businesses">Business / SMB</option>
+            <option value="enterprise teams">Enterprise</option>
+            <option value="developers">Developers</option>
+            <option value="creators">Creators</option>
+            <option value="students">Students</option>
+          </select>
+        </div>
+        <div class="field"><label>YouTube ID</label><input type="text" id="f-yt" placeholder="dQw4w9WgXcQ"></div>
+      </div>
+
+      <!-- AUTO PARAGRAPH -->
+      <div class="field">
+        <label>Auto-paragraph — insert after</label>
+        <select id="f-para">
+          <option value="bullets">Feature Bullets</option>
+          <option value="hero">Hero</option>
+          <option value="price">Price + Trust</option>
+          <option value="wyg">What You Get</option>
+          <option value="features">Features</option>
+          <option value="specs">Specs</option>
+        </select>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Claude generates 150-200 words from fetched URL content</div>
+      </div>
+
+      <!-- STRUCTURE -->
+      <div>
+        <div class="sec-title">Page Structure</div>
+        <div class="preset-grid">
+          <button class="preset-btn on" onclick="applyPreset('A',this)"><span class="pname">A — Classic</span><span class="pdesc">Hero→Features→Benefits→Specs→FAQ→Buy</span></button>
+          <button class="preset-btn" onclick="applyPreset('B',this)"><span class="pname">B — Sales</span><span class="pdesc">Hero→Price→Proof→BA→FAQ→Buy</span></button>
+          <button class="preset-btn" onclick="applyPreset('C',this)"><span class="pname">C — Story</span><span class="pdesc">Hero→Benefits→Features→Proof→Buy</span></button>
+          <button class="preset-btn" onclick="applyPreset('D',this)"><span class="pname">D — Minimal</span><span class="pdesc">Hero→Price→Bullets→Specs→FAQ→Buy</span></button>
+          <button class="preset-btn" onclick="applyPreset('E',this)"><span class="pname">E — Trust</span><span class="pdesc">Hero→Reviews→Features→FAQ→Buy</span></button>
+          <button class="preset-btn" onclick="applyPreset('F',this)"><span class="pname">F — Full</span><span class="pdesc">All sections</span></button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin:6px 0">drag to reorder · ✕/＋ to toggle</div>
+        <div class="builder-cols">
+          <div>
+            <div class="col-title"><span style="color:var(--blue)">●</span> Active</div>
+            <div class="drop-zone" id="active-z" ondragover="onOver(event,'active')" ondrop="onDrop(event,'active')" ondragleave="onLeave(event)"></div>
+          </div>
+          <div>
+            <div class="col-title"><span style="color:var(--muted)">○</span> Inactive</div>
+            <div class="drop-zone" id="inactive-z" ondragover="onOver(event,'inactive')" ondrop="onDrop(event,'inactive')" ondragleave="onLeave(event)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RICH FEATURES -->
+      <div>
+        <div class="sec-title">Rich Features</div>
+        <div class="rich-grid">
+          <label class="ri" style="opacity:.5;cursor:default" title="Images are taken from source URLs automatically"><input type="checkbox" id="r-unsplash" disabled> 🖼 Source images (auto)</label>
+          <label class="ri"><input type="checkbox" id="r-video" checked> ▶ YouTube video</label>
+          <label class="ri"><input type="checkbox" id="r-anim" checked> ✨ Scroll animations</label>
+          <label class="ri"><input type="checkbox" id="r-counter" checked> 🔢 Counters</label>
+          <label class="ri"><input type="checkbox" id="r-tabs" checked> ▣ Feature tabs</label>
+          <label class="ri"><input type="checkbox" id="r-popup" checked> 🏷 Discount popup</label>
+          <label class="ri"><input type="checkbox" id="r-chat" checked> 💬 Live chat</label>
+          <label class="ri"><input type="checkbox" id="r-ba"> ⇔ Before/After</label>
+          <label class="ri"><input type="checkbox" id="r-pricing"> ⇄ Pricing toggle</label>
+          <label class="ri"><input type="checkbox" id="r-sticky"> 📌 Sticky bar</label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="sb-footer">
+      <button class="gen-btn" id="gen-btn" onclick="generate()">✦ Generate</button>
+      <div class="gen-status" id="gen-status"></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="tabs">
+      <button class="tab on" onclick="swTab('preview',this)">🖥 Preview</button>
+      <button class="tab" onclick="swTab('copy',this)">📝 Copy & SEO</button>
+      <button class="tab" onclick="swTab('log',this)" id="tab-log">📋 Live Log</button>
+      <button class="tab" onclick="swTab('outputs',this)">📁 All Outputs</button>
+      <button class="tab" onclick="swTab('library',this)">📚 Library</button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div id="tab-preview" class="panel on">
+      <div id="preview-ph" class="ph">
+        <div class="ph-icon">🖥</div>
+        <h2>No page generated yet</h2>
+        <p>Fill in your product details, add source URLs, and click Generate. Claude Code will fetch the real content and build your page.</p>
+      </div>
+      <div id="preview-wrap" style="display:none;flex:1;flex-direction:column">
+        <div class="preview-bar">
+          <button class="hbtn primary" onclick="downloadHtml()">⬇ Download .html</button>
+          <button class="hbtn" onclick="openTab()">↗ New tab</button>
+          <button class="hbtn" onclick="copyHtml()">⧉ Copy HTML</button>
+          <span id="preview-fname"></span>
+        </div>
+        <iframe id="preview" title="Preview"></iframe>
+      </div>
+    </div>
+
+    <!-- COPY -->
+    <div id="tab-copy" class="panel">
+      <div id="copy-ph" class="ph">
+        <div class="ph-icon">📝</div>
+        <h2>No copy generated yet</h2>
+        <p>Generate a page to see the product description, SEO pack, email sequence, and social posts here.</p>
+      </div>
+      <div id="copy-wrap" style="display:none;flex:1;flex-direction:column">
+        <div class="preview-bar">
+          <button class="hbtn" onclick="copyCopy()">⧉ Copy All</button>
+          <button class="hbtn" onclick="downloadCopy()">⬇ Download .md</button>
+          <span id="copy-fname"></span>
+        </div>
+        <div class="copy-content" id="copy-content"></div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div id="tab-log" class="panel">
+      <div class="log-area" id="log-area">
+        <div class="log-line info">Waiting for generation...</div>
+        <div class="log-line info">Click Generate to start. Claude Code will run and show output here.</div>
+      </div>
+    </div>
+
+    <!-- OUTPUTS -->
+    <div id="tab-outputs" class="panel">
+      <div class="outputs-list" id="outputs-list">
+        <div class="ph" style="flex:1">
+          <div class="ph-icon">📁</div>
+          <h2>No files yet</h2>
+          <p>Generated files appear here.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div id="tab-library" class="panel">
+      <div class="lib-list" id="lib-list">
+        <div class="ph" style="flex:1">
+          <div class="ph-icon">📚</div>
+          <h2>Loading library...</h2>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let mode='desc', urls=[], dragSrc=null;
+let gHtml='', gCopy='', gSlug='';
+
+const ALL_SECS=[
+  {id:'hero',l:'🏠 Hero'},{id:'stats',l:'📊 Stats'},{id:'price',l:'💰 Price+Trust'},
+  {id:'social_proof',l:'🔴 Social Proof'},{id:'bullets',l:'✅ Bullets'},
+  {id:'para',l:'📄 Paragraph'},{id:'wyg',l:'📦 What You Get'},
+  {id:'features',l:'⚡ Features'},{id:'benefits',l:'🌟 Benefits'},
+  {id:'specs',l:'📋 Specs'},{id:'testimonials',l:'⭐ Testimonials'},
+  {id:'faq',l:'❓ FAQ'},{id:'comparison',l:'⚖️ Comparison'},
+  {id:'gallery',l:'🖼 Gallery'},{id:'video',l:'▶ Video'},
+  {id:'ba',l:'⇔ Before/After'},{id:'newsletter',l:'📧 Newsletter'},
+  {id:'navbar',l:'🔗 Navbar'},{id:'cta_footer',l:'🎯 Buy Now CTA'},
+];
+
+const PRESETS={
+  A:['hero','stats','price','bullets','para','wyg','features','benefits','specs','testimonials','faq','cta_footer'],
+  B:['hero','price','social_proof','bullets','ba','para','wyg','testimonials','specs','faq','cta_footer'],
+  C:['hero','stats','benefits','wyg','features','bullets','para','testimonials','specs','faq','cta_footer'],
+  D:['hero','price','bullets','para','specs','faq','cta_footer'],
+  E:['hero','social_proof','price','testimonials','wyg','para','features','comparison','specs','faq','cta_footer'],
+  F:['hero','stats','social_proof','price','bullets','para','wyg','features','benefits','specs','ba','testimonials','comparison','faq','gallery','video','newsletter','cta_footer'],
+};
+
+let activeList=[...PRESETS.A];
+let inactiveList=ALL_SECS.filter(s=>!activeList.includes(s.id)).map(s=>s.id);
+
+// ── INIT ────────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  render();
+  loadLibrary();
+  loadOutputs();
+});
+
+// ── MODE ────────────────────────────────────────────────────────────
+function setMode(m){
+  mode=m;
+  document.getElementById('m-desc').classList.toggle('on',m==='desc');
+  document.getElementById('m-landing').classList.toggle('on',m==='landing');
+  if(m==='desc'){
+    activeList=activeList.filter(s=>s!=='navbar');
+    if(!inactiveList.includes('navbar'))inactiveList.push('navbar');
+    render();
+  }
+}
+
+// ── TABS ────────────────────────────────────────────────────────────
+function swTab(n,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('tab-'+n).classList.add('on');
+  if(n==='outputs')loadOutputs();
+  if(n==='library')loadLibrary();
+}
+function swMainTab(n){swTab(n,document.getElementById('hbtn-'+n)||document.createElement('button'));}
+
+// ── URLs ────────────────────────────────────────────────────────────
+function addUrl(){
+  const inp=document.getElementById('url-inp');
+  const v=inp.value.trim();
+  if(!v||urls.includes(v))return;
+  if(urls.length>=4){toast('Max 4 URLs');return;}
+  try{new URL(v);}catch(e){toast('Invalid URL');return;}
+  urls.push(v);inp.value='';renderUrls();
+}
+function removeUrl(i){urls.splice(i,1);renderUrls();}
+function renderUrls(){
+  document.getElementById('url-list').innerHTML=urls.map((u,i)=>`
+    <div class="url-tag">
+      <span style="color:var(--blue);font-size:12px;flex-shrink:0">🔗</span>
+      <span title="${u}">${u}</span>
+      <button class="url-rm" onclick="removeUrl(${i})">✕</button>
+    </div>`).join('');
+}
+document.getElementById('url-inp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addUrl();}});
+
+// ── STRUCTURE ─────────────────────────────────────────────────────
+function applyPreset(k,btn){
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  let p=[...PRESETS[k]];
+  if(mode==='desc')p=p.filter(s=>s!=='navbar');
+  activeList=p;
+  inactiveList=ALL_SECS.filter(s=>!activeList.includes(s.id)).map(s=>s.id);
+  render();
+}
+
+function render(){
+  const az=document.getElementById('active-z');
+  const iz=document.getElementById('inactive-z');
+  az.innerHTML=activeList.length?'':'<div class="zone-hint">Drop here</div>';
+  iz.innerHTML=inactiveList.length?'':'<div class="zone-hint">All active</div>';
+  activeList.forEach(id=>{const s=ALL_SECS.find(x=>x.id===id);if(s)az.appendChild(chip(s,true));});
+  inactiveList.forEach(id=>{const s=ALL_SECS.find(x=>x.id===id);if(s)iz.appendChild(chip(s,false));});
+}
+
+function chip(sec,active){
+  const d=document.createElement('div');
+  d.className='sec-chip'+(active?' act':'');
+  d.draggable=true;d.dataset.id=sec.id;d.dataset.zone=active?'active':'inactive';
+  d.innerHTML=`<span class="drag-h">⠿</span><span class="chip-lbl">${sec.l}</span><button class="chip-tog" onclick="tog('${sec.id}','${active?'active':'inactive'}')">${active?'✕':'＋'}</button>`;
+  d.addEventListener('dragstart',ds);d.addEventListener('dragend',de);
+  return d;
+}
+
+function tog(id,zone){
+  if(zone==='active'){activeList=activeList.filter(s=>s!==id);if(!inactiveList.includes(id))inactiveList.push(id);}
+  else{if(!activeList.includes(id))activeList.push(id);inactiveList=inactiveList.filter(s=>s!==id);}
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('on'));render();
+}
+
+function ds(e){dragSrc=e.currentTarget;dragSrc.classList.add('dragging');e.dataTransfer.setData('text/plain',dragSrc.dataset.id);}
+function de(){document.querySelectorAll('.sec-chip').forEach(c=>c.classList.remove('dragging'));document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('over'));}
+function onOver(e,z){e.preventDefault();document.getElementById(z+'-z').classList.add('over');}
+function onLeave(e){e.currentTarget.classList.remove('over');}
+function onDrop(e,tz){
+  e.preventDefault();e.currentTarget.classList.remove('over');
+  const id=e.dataTransfer.getData('text/plain');if(!id)return;
+  const zone=document.getElementById(tz+'-z');
+  const chips=[...zone.querySelectorAll('.sec-chip:not(.dragging)')];
+  let before=null;
+  for(const c of chips){const r=c.getBoundingClientRect();if(e.clientY<r.top+r.height/2){before=c;break;}}
+  if(tz==='active'){
+    activeList=activeList.filter(s=>s!==id);inactiveList=inactiveList.filter(s=>s!==id);
+    before?activeList.splice(activeList.indexOf(before.dataset.id),0,id):activeList.push(id);
+  }else{
+    activeList=activeList.filter(s=>s!==id);
+    if(!inactiveList.includes(id)){before?inactiveList.splice(inactiveList.indexOf(before.dataset.id),0,id):inactiveList.push(id);}
+  }
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('on'));render();
+}
+
+// ── GENERATE ─────────────────────────────────────────────────────
+// ── GENERATE — Direct Anthropic API via server ───────────────────
+function toggleKey(){
+  const i=document.getElementById('f-apikey');
+  i.type=i.type==='password'?'text':'password';
+}
+
+const PROVIDER_META={
+  anthropic:{label:'🔑 Anthropic API Key',placeholder:'sk-ant-api03-...',hint:'Get at <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> — $5 = ~100 pages',showBaseUrl:false},
+  openai:{label:'🔑 OpenAI API Key',placeholder:'sk-proj-...',hint:'Get at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue)">platform.openai.com/api-keys</a>',showBaseUrl:false},
+  custom:{label:'🔑 API Key',placeholder:'your key',hint:'For a legitimate OpenAI-compatible account you hold (Azure OpenAI, self-hosted, etc).',showBaseUrl:true}
+};
+
+function onProviderChange(){
+  const p=document.getElementById('f-provider').value;
+  const meta=PROVIDER_META[p];
+  document.getElementById('f-apikey-label').textContent=meta.label;
+  document.getElementById('f-apikey').placeholder=meta.placeholder;
+  document.getElementById('f-apikey-hint').innerHTML=meta.hint;
+  document.getElementById('f-baseurl-wrap').style.display=meta.showBaseUrl?'block':'none';
+}
+
+async function generate(){
+  const product=document.getElementById('f-product').value.trim();
+  const apiKey=document.getElementById('f-apikey').value.trim();
+  const provider=document.getElementById('f-provider').value;
+  const model=document.getElementById('f-model').value.trim();
+  const baseUrl=document.getElementById('f-baseurl').value.trim();
+  if(!product){toast('Enter a product name');return;}
+  if(!apiKey){toast('Enter your API key');return;}
+  if(provider==='custom'&&!baseUrl){toast('Enter a base URL for the custom provider');return;}
+
+  const slug=product.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50);
+  gSlug=slug;
+
+  const config={
+    product,slug,
+    price:document.getElementById('f-price').value.trim(),
+    original_price:document.getElementById('f-orig').value.trim(),
+    prod_color:document.getElementById('f-color').value,
+    audience:document.getElementById('f-aud').value,
+    language:document.getElementById('f-lang').value,
+    cta:document.getElementById('f-cta').value,
+    tone:document.getElementById('f-tone').value,
+    mode,source_urls:urls,
+    youtube_id:document.getElementById('f-yt').value.trim(),
+    para_position:document.getElementById('f-para').value,
+    structure:[...activeList],
+    rich:{
+      unsplash:document.getElementById('r-unsplash').checked,
+      video:document.getElementById('r-video').checked,
+      animations:document.getElementById('r-anim').checked,
+      counters:document.getElementById('r-counter').checked,
+      feature_tabs:document.getElementById('r-tabs').checked,
+      popup:document.getElementById('r-popup').checked,
+      chat:document.getElementById('r-chat').checked,
+      before_after:document.getElementById('r-ba').checked,
+      pricing_toggle:document.getElementById('r-pricing').checked,
+      sticky_bar:document.getElementById('r-sticky').checked,
+    }
+  };
+
+  await fetch('/api/save-product',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(config)});
+
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true; btn.textContent='Generating...';
+  setStatus('Starting...');
+
+  const log=document.getElementById('log-area');
+  log.innerHTML='';
+  addLog('info','Product: '+product);
+
+  // Show log tab
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-log').classList.add('on');
+  document.querySelectorAll('.tab')[2].classList.add('on');
+
+  try{
+    const res=await fetch('/api/generate',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'x-provider':provider,
+        ...(model?{'x-model':model}:{}),
+        ...(provider==='custom'?{'x-base-url':baseUrl}:{})
+      },
+      body:JSON.stringify(config)
+    });
+
+    const reader=res.body.getReader();
+    const decoder=new TextDecoder();
+    let buffer='';
+
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      buffer+=decoder.decode(value,{stream:true});
+      const lines=buffer.split('\n');
+      buffer=lines.pop();
+      for(const line of lines){
+        if(line.startsWith('data: ')){
+          try{
+            const msg=JSON.parse(line.slice(6));
+            if(msg.type==='log') addLog('',msg.data);
+            if(msg.type==='done'){
+              if(msg.data.success){
+                addLog('done-ok','');
+                addLog('done-ok','All done! Files: '+msg.data.files.join(', '));
+                await loadPreview(slug);
+                await loadCopy(slug);
+                await loadOutputs();
+                setStatus('Done! Check Preview tab.');
+              }else{
+                addLog('done-err','Error: '+msg.data.error);
+                setStatus('Error — check Log');
+              }
+            }
+          }catch(e){}
+        }
+      }
+    }
+  }catch(err){
+    addLog('done-err','Error: '+err.message);
+    setStatus('Error: '+err.message);
+  }
+
+  btn.disabled=false; btn.textContent='Generate';
+}
+
+function addLog(cls,text){
+  const log=document.getElementById('log-area');
+  const div=document.createElement('div');
+  div.className='log-line'+(cls?' '+cls:'');
+  div.textContent=text;
+  log.appendChild(div);
+  log.scrollTop=log.scrollHeight;
+}
+
+function setStatus(msg){document.getElementById('gen-status').textContent=msg;}
+
+// ── PREVIEW ──────────────────────────────────────────────────────
+async function loadPreview(slug){
+  try{
+    const r=await fetch('/api/file?name='+slug+'.html');
+    if(r.ok){const h=await r.text();showHtmlPreview(h,slug+'.html');gHtml=h;}
+  }catch(e){}
+}
+
+async function loadCopy(slug){
+  try{
+    const r=await fetch('/api/file?name='+slug+'-copy.md');
+    if(r.ok){
+      gCopy=await r.text();
+      document.getElementById('copy-content').textContent=gCopy;
+      document.getElementById('copy-ph').style.display='none';
+      document.getElementById('copy-wrap').style.display='flex';
+      document.getElementById('copy-fname').textContent=slug+'-copy.md';
+    }
+  }catch(e){}
+}
+
+function showHtmlPreview(html, fname){
+  const fr=document.getElementById('preview');
+  fr.srcdoc=html;
+  document.getElementById('preview-ph').style.display='none';
+  document.getElementById('preview-wrap').style.display='flex';
+  document.getElementById('preview-fname').textContent=fname;
+  setTimeout(()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+    document.getElementById('tab-preview').classList.add('on');
+    document.querySelectorAll('.tab')[0].classList.add('on');
+    try{fr.style.height=Math.max(600,fr.contentDocument.body.scrollHeight+40)+'px';}catch(e){}
+  },1500);
+}
+
+async function loadOutputs(){
+  try{
+    const res=await fetch('/api/outputs');
+    const files=await res.json();
+    const list=document.getElementById('outputs-list');
+    if(!files.length){
+      list.innerHTML='<div class="ph" style="flex:1"><div class="ph-icon">📁</div><h2>No files yet</h2><p>Generated files appear here.</p></div>';
+      return;
+    }
+    const getIcon = n => {
+      if(n.endsWith('-elementor.html')) return '🧩';
+      if(n.endsWith('-elementor.css')) return '🎨';
+      if(n.endsWith('-elementor.js')) return '⚙️';
+      if(n.endsWith('.html')) return '🖥';
+      if(n.endsWith('.md')) return '📝';
+      return '📄';
+    };
+    const getLabel = n => {
+      if(n.endsWith('-elementor.html')) return 'Elementor HTML — paste in HTML widget';
+      if(n.endsWith('-elementor.css')) return 'Elementor CSS — paste in Custom CSS';
+      if(n.endsWith('-elementor.js')) return 'Elementor JS — paste in Custom Code';
+      if(n.endsWith('-copy.md')) return 'Copy & SEO pack';
+      if(n.endsWith('.html')) return 'Full standalone page';
+      return '';
+    };
+    list.innerHTML=files.map(f=>`
+      <div class="output-card">
+        <div class="output-icon">${getIcon(f.name)}</div>
+        <div class="output-info">
+          <div class="output-name">${f.name}</div>
+          <div class="output-meta">${getLabel(f.name)} · ${(f.size/1024).toFixed(1)} KB · ${new Date(f.modified).toLocaleString()}</div>
+        </div>
+        <div class="output-actions">
+          ${f.name.endsWith('.html')&&!f.name.includes('elementor')?`<button class="obtn" onclick="previewFile('${f.name}')">Preview</button>`:''}
+          <button class="obtn" onclick="downloadFile('${f.name}')">Download</button>
+          <button class="obtn" onclick="copyFileContent('${f.name}')">Copy</button>
+        </div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+async function previewFile(name){
+  const res=await fetch(`/api/file?name=${name}`);
+  gHtml=await res.text();
+  gSlug=name.replace('.html','');
+  const fr=document.getElementById('preview');
+  fr.srcdoc=gHtml;
+  document.getElementById('preview-ph').style.display='none';
+  document.getElementById('preview-wrap').style.display='flex';
+  document.getElementById('preview-fname').textContent=name;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-preview').classList.add('on');
+  document.querySelectorAll('.tab')[0].classList.add('on');
+}
+
+async function copyFileContent(name){
+  const res=await fetch('/api/file?name='+name);
+  const text=await res.text();
+  navigator.clipboard.writeText(text).then(()=>toast('Copied: '+name));
+}
+
+async function downloadFile(name){
+  const res=await fetch(`/api/file?name=${name}`);
+  const text=await res.text();
+  const blob=new Blob([text],{type:name.endsWith('.html')?'text/html':'text/markdown'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  toast('Downloaded: '+name);
+}
+
+// ── LIBRARY ──────────────────────────────────────────────────────
+async function loadLibrary(){
+  try{
+    const res=await fetch('/api/products');
+    const data=await res.json();
+    const list=document.getElementById('lib-list');
+    list.innerHTML=data.products.map((p,i)=>`
+      <div class="lib-card">
+        <div class="lib-dot" style="background:${p.prod_color||'#0D78F2'}"></div>
+        <div class="lib-name">${p.product}</div>
+        <div class="lib-price">$${p.price}</div>
+        <button class="lib-load" onclick="loadProduct(${i})">Load</button>
+      </div>`).join('');
+  }catch(e){}
+}
+
+async function loadProduct(i){
+  const res=await fetch('/api/products');
+  const data=await res.json();
+  const p=data.products[i];
+  document.getElementById('f-product').value=p.product||'';
+  document.getElementById('f-price').value=p.price||'';
+  document.getElementById('f-orig').value=p.original_price||'';
+  document.getElementById('f-color').value=p.prod_color||'#FF0000';
+  document.getElementById('f-yt').value=p.youtube_id||'';
+  if(p.mode)setMode(p.mode);
+  urls=p.source_urls||[];renderUrls();
+  if(p.structure){
+    activeList=p.mode==='desc'?p.structure.filter(s=>s!=='navbar'):p.structure;
+    inactiveList=ALL_SECS.filter(s=>!activeList.includes(s.id)).map(s=>s.id);
+    render();
+  }
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('on'));
+  toast('Loaded: '+p.product.slice(0,40));
+  // Switch to main view
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-preview').classList.add('on');
+  document.querySelectorAll('.tab')[0].classList.add('on');
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────
+function downloadHtml(){if(!gHtml)return;const b=new Blob([gHtml],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=gSlug+'.html';a.click();toast('Downloaded!');}
+function openTab(){if(!gHtml)return;const w=window.open('','_blank');w.document.write(gHtml);w.document.close();}
+function copyHtml(){if(!gHtml)return;navigator.clipboard.writeText(gHtml).then(()=>toast('HTML copied!'));}
+function copyCopy(){if(!gCopy)return;navigator.clipboard.writeText(gCopy).then(()=>toast('Copied!'));}
+function downloadCopy(){if(!gCopy)return;const b=new Blob([gCopy],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=gSlug+'-copy.md';a.click();}
+
+function toast(m){
+  const el=document.getElementById('toast');
+  el.textContent=m;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
