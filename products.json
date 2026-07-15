@@ -1,0 +1,334 @@
+{
+  "products": [
+    {
+      "product": "Adobe Acrobat Pro | PDF Software | Convert, Edit, E-Sign, Protect | For Windows 1-Device Lifetime",
+      "slug": "adobe-acrobat-pro",
+      "price": "50.99",
+      "original_price": "239.99",
+      "prod_color": "#FF0000",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.adobe.com/acrobat/acrobat-pro.html",
+        "https://helpx.adobe.com/acrobat/using/whats-new.html"
+      ]
+    },
+    {
+      "product": "Microsoft Office 2024 Professional Plus Activation Key",
+      "slug": "microsoft-office-2024-pro",
+      "price": "30.99",
+      "original_price": "249.99",
+      "prod_color": "#D83B01",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.microsoft.com/en-us/microsoft-365/get-started-with-office-2024",
+        "https://support.microsoft.com/en-US/Office/what-s-new-in-office-2024-and-office-ltsc-2024"
+      ]
+    },
+    {
+      "product": "Nitro Pro 14 PDF Editor Lifetime License Key 1PC Windows",
+      "slug": "nitro-pro-14",
+      "price": "68.29",
+      "original_price": "179.99",
+      "prod_color": "#ff0000",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.gonitro.com/",
+        "https://www.gonitro.com/pdf"
+      ]
+    },
+    {
+      "product": "Malwarebytes Premium V4 1PC Lifetime License Key Worldwide",
+      "slug": "malwarebytes-premium-v4",
+      "price": "35.99",
+      "original_price": "119.99",
+      "prod_color": "#1254A1",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.malwarebytes.com/premium",
+        "https://www.malwarebytes.com/solutions/antivirus"
+      ]
+    },
+    {
+      "product": "Nitro Pro 14 PDF Editor Lifetime License Key 1PC Windows",
+      "slug": "nitro-pro-14-pdf-editor-lifetime-license-key-1pc-w",
+      "price": "68.29",
+      "original_price": "179.99",
+      "prod_color": "#d93706",
+      "audience": "general consumers",
+      "language": "English",
+      "cta": "Buy Now",
+      "tone": "professional",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.gonitro.com/",
+        "https://www.gonitro.com/pdf"
+      ],
+      "youtube_id": "",
+      "para_position": "wyg",
+      "structure": [
+        "hero",
+        "stats",
+        "price",
+        "bullets",
+        "para",
+        "wyg",
+        "features",
+        "benefits",
+        "gallery",
+        "specs",
+        "video",
+        "testimonials",
+        "faq",
+        "cta_footer"
+      ],
+      "rich": {
+        "unsplash": true,
+        "video": true,
+        "animations": true,
+        "counters": true,
+        "feature_tabs": true,
+        "popup": false,
+        "chat": false,
+        "before_after": false,
+        "pricing_toggle": false,
+        "sticky_bar": false
+      }
+    },
+    {
+      "product": "Microsoft Office 2024 Professional Plus Activation Key",
+      "slug": "microsoft-office-2024-professional-plus-activation",
+      "price": "30.99",
+      "original_price": "249.99",
+      "prod_color": "#d83b01",
+      "audience": "general consumers",
+      "language": "English",
+      "cta": "Buy Now",
+      "tone": "professional",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.microsoft.com/en-us/microsoft-365/get-started-with-office-2024",
+        "https://support.microsoft.com/en-US/Office/what-s-new-in-office-2024-and-office-ltsc-2024"
+      ],
+      "youtube_id": "",
+      "para_position": "bullets",
+      "structure": [
+        "hero",
+        "stats",
+        "price",
+        "bullets",
+        "para",
+        "wyg",
+        "features",
+        "benefits",
+        "specs",
+        "testimonials",
+        "faq",
+        "cta_footer"
+      ],
+      "rich": {
+        "unsplash": true,
+        "video": true,
+        "animations": true,
+        "counters": true,
+        "feature_tabs": true,
+        "popup": true,
+        "chat": true,
+        "before_after": false,
+        "pricing_toggle": false,
+        "sticky_bar": false
+      }
+    },
+    {
+      "product": "Adobe Acrobat Pro 2024 | 3-Year License Key | USA",
+      "slug": "adobe-acrobat-pro-2024-3-year-license-key-usa",
+      "price": "155.99",
+      "original_price": "299.88",
+      "prod_color": "#b30c00",
+      "audience": "general consumers",
+      "language": "English",
+      "cta": "Buy Now",
+      "tone": "professional",
+      "mode": "desc",
+      "source_urls": [
+        "https://get.adobe.com/reader/",
+        "https://www.adobe.com/acrobat/pdf-reader.html",
+        "https://www.adobe.com/mena_en/acrobat/complete-pdf-solution.html",
+        "https://www.adobe.com/africa/acrobat.html"
+      ],
+      "youtube_id": "",
+      "para_position": "bullets",
+      "structure": [
+        "hero",
+        "price",
+        "stats",
+        "bullets",
+        "para",
+        "wyg",
+        "features",
+        "benefits",
+        "specs",
+        "gallery",
+        "video",
+        "testimonials",
+        "faq",
+        "cta_footer"
+      ],
+      "rich": {
+        "unsplash": false,
+        "video": true,
+        "animations": true,
+        "counters": true,
+        "feature_tabs": true,
+        "popup": false,
+        "chat": false,
+        "before_after": false,
+        "pricing_toggle": false,
+        "sticky_bar": false
+      }
+    },
+    {
+      "product": "Adobe Acrobat Pro | PDF Software | Convert, Edit, E-Sign, Protect | For Windows 1-Device Lifetime",
+      "slug": "adobe-acrobat-pro-pdf-software-convert-edit-e-sign",
+      "price": "155.99",
+      "original_price": "299.88",
+      "prod_color": "#ac0200",
+      "audience": "general consumers",
+      "language": "English",
+      "cta": "Buy Now",
+      "tone": "professional",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.adobe.com/acrobat/acrobat-pro.html",
+        "https://helpx.adobe.com/acrobat/using/whats-new.html",
+        "https://www.adobe.com/mena_en/acrobat/complete-pdf-solution.html",
+        "https://www.adobe.com/africa/acrobat.html"
+      ],
+      "youtube_id": "5M1a7zY5iVM",
+      "para_position": "wyg",
+      "structure": [
+        "hero",
+        "stats",
+        "price",
+        "bullets",
+        "para",
+        "wyg",
+        "features",
+        "benefits",
+        "specs",
+        "gallery",
+        "video",
+        "testimonials",
+        "faq",
+        "cta_footer"
+      ],
+      "rich": {
+        "unsplash": false,
+        "video": true,
+        "animations": true,
+        "counters": true,
+        "feature_tabs": true,
+        "popup": false,
+        "chat": false,
+        "before_after": false,
+        "pricing_toggle": false,
+        "sticky_bar": false
+      }
+    },
+    {
+      "product": "Bluebeam Revu eXtreme 20 Lifetime License for Windows",
+      "slug": "bluebeam-revu-extreme-20-lifetime-license-for-wind",
+      "price": "215.45",
+      "original_price": "239.99",
+      "prod_color": "#0080d7",
+      "audience": "general consumers",
+      "language": "English",
+      "cta": "Buy Now",
+      "tone": "professional",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.bluebeam.com/",
+        "https://www.bluebeam.com/download/",
+        "https://www.bluebeam.com/product/",
+        "https://www.bluebeam.com/pricing/"
+      ],
+      "youtube_id": "4TJplf9LpmhkO0fA",
+      "para_position": "wyg",
+      "structure": [
+        "hero",
+        "stats",
+        "price",
+        "bullets",
+        "para",
+        "wyg",
+        "features",
+        "benefits",
+        "specs",
+        "gallery",
+        "video",
+        "testimonials",
+        "faq",
+        "cta_footer"
+      ],
+      "rich": {
+        "unsplash": false,
+        "video": true,
+        "animations": true,
+        "counters": false,
+        "feature_tabs": true,
+        "popup": false,
+        "chat": false,
+        "before_after": false,
+        "pricing_toggle": false,
+        "sticky_bar": false
+      }
+    },
+    {
+      "product": "Malwarebytes Premium V4 1PC Lifetime License Key Worldwide",
+      "slug": "malwarebytes-premium-v4-1pc-lifetime-license-key-w",
+      "price": "35.99",
+      "original_price": "119.99",
+      "prod_color": "#1254a1",
+      "audience": "general consumers",
+      "language": "English",
+      "cta": "Buy Now",
+      "tone": "professional",
+      "mode": "desc",
+      "source_urls": [
+        "https://www.malwarebytes.com/",
+        "https://www.malwarebytes.com/solutions/virus-scanner",
+        "https://www.malwarebytes.com/pt/mwb-download",
+        "https://www.malwarebytes.com/premium"
+      ],
+      "youtube_id": "Sl80k5FNQ7g",
+      "para_position": "wyg",
+      "structure": [
+        "hero",
+        "stats",
+        "price",
+        "bullets",
+        "para",
+        "wyg",
+        "features",
+        "benefits",
+        "specs",
+        "gallery",
+        "video",
+        "testimonials",
+        "faq",
+        "cta_footer"
+      ],
+      "rich": {
+        "unsplash": false,
+        "video": true,
+        "animations": true,
+        "counters": true,
+        "feature_tabs": true,
+        "popup": false,
+        "chat": false,
+        "before_after": false,
+        "pricing_toggle": false,
+        "sticky_bar": false
+      }
+    }
+  ]
+}

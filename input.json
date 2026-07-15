@@ -1,0 +1,44 @@
+{
+  "product": "Nitro Pro 14 PDF Editor Lifetime License Key 1PC Windows",
+  "slug": "nitro-pro-14-pdf-editor-lifetime-license-key-1pc-w",
+  "price": "68.29",
+  "original_price": "179.99",
+  "prod_color": "#ff0000",
+  "audience": "general consumers",
+  "language": "English",
+  "cta": "Buy Now",
+  "tone": "professional",
+  "mode": "desc",
+  "source_urls": [
+    "https://www.gonitro.com/",
+    "https://www.gonitro.com/pdf"
+  ],
+  "youtube_id": "",
+  "para_position": "bullets",
+  "structure": [
+    "hero",
+    "stats",
+    "price",
+    "bullets",
+    "para",
+    "wyg",
+    "features",
+    "benefits",
+    "specs",
+    "testimonials",
+    "faq",
+    "cta_footer"
+  ],
+  "rich": {
+    "unsplash": true,
+    "video": true,
+    "animations": true,
+    "counters": true,
+    "feature_tabs": true,
+    "popup": false,
+    "chat": false,
+    "before_after": false,
+    "pricing_toggle": false,
+    "sticky_bar": false
+  }
+}
