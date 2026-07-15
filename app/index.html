@@ -201,11 +201,29 @@ iframe#preview{flex:1;border:none;background:#fff}
         <input type="text" id="f-model" placeholder="leave blank for default" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px">
       </div>
 
-      <!-- BASE URL (custom provider only) -->
-      <div class="field" id="f-baseurl-wrap" style="display:none">
-        <label>Base URL</label>
-        <input type="text" id="f-baseurl" placeholder="https://your-endpoint.example.com" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace">
-        <div style="font-size:11px;color:var(--muted);margin-top:3px">Only point this at an OpenAI-compatible endpoint you have a real, legitimate account with (Azure OpenAI, your own self-hosted server, etc). Assumes a standard <code>/chat/completions</code> API shape.</div>
+      <!-- CUSTOM PROVIDER CONFIG -->
+      <div class="field" id="f-custom-wrap" style="display:none">
+        <label>Full Endpoint URL</label>
+        <input type="text" id="f-endpoint" placeholder="https://your-provider.com/v1/chat/completions" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace">
+        <div style="font-size:11px;color:var(--muted);margin:3px 0 8px">The complete request URL, including path. Only use an endpoint you have a real, legitimate account with.</div>
+
+        <label>Auth style</label>
+        <select id="f-auth-style" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;margin-bottom:8px">
+          <option value="bearer">Authorization: Bearer &lt;key&gt;</option>
+          <option value="x-api-key">x-api-key: &lt;key&gt;</option>
+        </select>
+
+        <label>Response format</label>
+        <select id="f-response-shape" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;margin-bottom:8px">
+          <option value="openai">OpenAI-style (choices[].message.content)</option>
+          <option value="anthropic">Anthropic-style (content[].text)</option>
+        </select>
+
+        <label>Extra header <span style="color:var(--muted);font-weight:400">(optional, e.g. anthropic-version)</span></label>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="f-extra-header-name" placeholder="header name" style="flex:1;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px">
+          <input type="text" id="f-extra-header-value" placeholder="value" style="flex:1;padding:7px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px">
+        </div>
       </div>
 
       <!-- MODE -->
@@ -560,9 +578,9 @@ function toggleKey(){
 }
 
 const PROVIDER_META={
-  anthropic:{label:'🔑 Anthropic API Key',placeholder:'sk-ant-api03-...',hint:'Get at <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> — $5 = ~100 pages',showBaseUrl:false},
-  openai:{label:'🔑 OpenAI API Key',placeholder:'sk-proj-...',hint:'Get at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue)">platform.openai.com/api-keys</a>',showBaseUrl:false},
-  custom:{label:'🔑 API Key',placeholder:'your key',hint:'For a legitimate OpenAI-compatible account you hold (Azure OpenAI, self-hosted, etc).',showBaseUrl:true}
+  anthropic:{label:'🔑 Anthropic API Key',placeholder:'sk-ant-api03-...',hint:'Get at <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> — $5 = ~100 pages',showCustom:false},
+  openai:{label:'🔑 OpenAI API Key',placeholder:'sk-proj-...',hint:'Get at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue)">platform.openai.com/api-keys</a>',showCustom:false},
+  custom:{label:'🔑 API Key',placeholder:'your key',hint:'For a legitimate account you hold with any OpenAI- or Anthropic-compatible endpoint.',showCustom:true}
 };
 
 function onProviderChange(){
@@ -571,7 +589,7 @@ function onProviderChange(){
   document.getElementById('f-apikey-label').textContent=meta.label;
   document.getElementById('f-apikey').placeholder=meta.placeholder;
   document.getElementById('f-apikey-hint').innerHTML=meta.hint;
-  document.getElementById('f-baseurl-wrap').style.display=meta.showBaseUrl?'block':'none';
+  document.getElementById('f-custom-wrap').style.display=meta.showCustom?'block':'none';
 }
 
 async function generate(){
@@ -579,10 +597,14 @@ async function generate(){
   const apiKey=document.getElementById('f-apikey').value.trim();
   const provider=document.getElementById('f-provider').value;
   const model=document.getElementById('f-model').value.trim();
-  const baseUrl=document.getElementById('f-baseurl').value.trim();
+  const endpoint=document.getElementById('f-endpoint').value.trim();
+  const authStyle=document.getElementById('f-auth-style').value;
+  const responseShape=document.getElementById('f-response-shape').value;
+  const extraHeaderName=document.getElementById('f-extra-header-name').value.trim();
+  const extraHeaderValue=document.getElementById('f-extra-header-value').value.trim();
   if(!product){toast('Enter a product name');return;}
   if(!apiKey){toast('Enter your API key');return;}
-  if(provider==='custom'&&!baseUrl){toast('Enter a base URL for the custom provider');return;}
+  if(provider==='custom'&&!endpoint){toast('Enter the full endpoint URL for the custom provider');return;}
 
   const slug=product.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50);
   gSlug=slug;
@@ -638,7 +660,12 @@ async function generate(){
         'x-api-key':apiKey,
         'x-provider':provider,
         ...(model?{'x-model':model}:{}),
-        ...(provider==='custom'?{'x-base-url':baseUrl}:{})
+        ...(provider==='custom'?{
+          'x-endpoint':endpoint,
+          'x-auth-style':authStyle,
+          'x-response-shape':responseShape,
+          ...(extraHeaderName?{'x-extra-header-name':extraHeaderName,'x-extra-header-value':extraHeaderValue}:{})
+        }:{})
       },
       body:JSON.stringify(config)
     });

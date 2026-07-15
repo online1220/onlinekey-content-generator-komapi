@@ -72,9 +72,10 @@ function fetchUrl(url) {
 // ── LLM PROVIDERS ───────────────────────────────────────────────────────
 // Each provider config: { hostname, path, buildHeaders(apiKey), buildBody(messages,maxTokens,model), parseResponse(json) }
 // "provider" is one of: "anthropic" | "openai" | "custom"
-// For "custom", the caller must also supply baseUrl (host[:port]) and model —
-// this covers any account you actually hold with an OpenAI-compatible API
-// (Azure OpenAI, self-hosted vLLM/Ollama with an OpenAI-compatible front end, etc).
+// For "custom", the caller supplies a full endpoint URL, auth style, and response
+// shape — this covers OpenAI-shaped and Anthropic-shaped chat APIs generically,
+// for any account you actually hold with a compatible API (Azure OpenAI,
+// self-hosted vLLM/Ollama with an OpenAI-compatible front end, Kimi, MiniMax, etc).
 // It intentionally does NOT special-case or whitelist any third-party resale/
 // proxy service — point this only at an endpoint you have a legitimate account with.
 
@@ -122,40 +123,48 @@ const PROVIDERS = {
   }
 };
 
-// Builds a "custom" provider definition on the fly from user-supplied base URL + model.
-// Assumes an OpenAI-compatible chat/completions shape, which is the de facto standard
-// for third-party-hosted-but-legitimately-yours endpoints (Azure OpenAI, self-hosted, etc).
-function customProvider(baseUrl, model) {
-  const u = new URL(baseUrl);
+// Builds a fully generic provider from explicit user config — no assumptions about
+// path structure, auth header name, or response shape. Covers "any endpoint you have
+// a legitimate account with" without guessing wrong. Use responsibly: point this only
+// at an API you actually hold a real account/key for.
+function customProvider(endpointUrl, model, authStyle, extraHeaderName, extraHeaderValue, responseShape) {
+  const u = new URL(endpointUrl);
   return {
     hostname: u.hostname,
     port: u.port || (u.protocol === 'http:' ? 80 : 443),
     protocol: u.protocol,
-    path: (u.pathname.replace(/\/$/, '') || '') + '/chat/completions',
+    path: u.pathname + u.search,
     defaultModel: model || 'default',
     buildHeaders(apiKey, bodyLen) {
-      return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Length': bodyLen
-      };
+      const h = { 'Content-Type': 'application/json', 'Content-Length': bodyLen };
+      if (authStyle === 'x-api-key') h['x-api-key'] = apiKey;
+      else h['Authorization'] = `Bearer ${apiKey}`;
+      if (extraHeaderName) h[extraHeaderName] = extraHeaderValue || '';
+      return h;
     },
     buildBody(messages, maxTokens, mdl) {
+      // Both OpenAI- and Anthropic-shaped chat APIs accept this same request body
+      // (model/messages/max_tokens) — only the response shape actually differs.
       return JSON.stringify({ model: mdl || this.defaultModel, max_tokens: maxTokens || 16000, messages });
     },
     parseResponse(parsed) {
-      if (parsed.error) throw new Error(parsed.error.message || JSON.stringify(parsed.error));
-      return parsed.choices.map(c => c.message?.content || '').join('');
+      if (responseShape === 'anthropic') {
+        if (parsed.error) throw new Error(typeof parsed.error === 'string' ? parsed.error : (parsed.error.message || JSON.stringify(parsed.error)));
+        return (parsed.content || []).map(b => b.text || '').join('');
+      }
+      // default: openai-style
+      if (parsed.error) throw new Error(typeof parsed.error === 'string' ? parsed.error : (parsed.error.message || JSON.stringify(parsed.error)));
+      return (parsed.choices || []).map(c => c.message?.content || '').join('');
     }
   };
 }
 
 function callLLM(opts, messages, maxTokens) {
-  const { provider, apiKey, model, baseUrl } = opts;
+  const { provider, apiKey, model, endpoint, authStyle, extraHeaderName, extraHeaderValue, responseShape } = opts;
   let cfg;
   if (provider === 'custom') {
-    if (!baseUrl) return Promise.reject(new Error('Custom provider requires a base URL.'));
-    cfg = customProvider(baseUrl, model);
+    if (!endpoint) return Promise.reject(new Error('Custom provider requires a full endpoint URL.'));
+    cfg = customProvider(endpoint, model, authStyle, extraHeaderName, extraHeaderValue, responseShape);
   } else {
     cfg = PROVIDERS[provider];
     if (!cfg) return Promise.reject(new Error(`Unknown provider: ${provider}`));
@@ -432,7 +441,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key, x-provider, x-model, x-base-url');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key, x-provider, x-model, x-endpoint, x-auth-style, x-extra-header-name, x-extra-header-value, x-response-shape');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
   if (req.method === 'GET' && url.pathname === '/api/products') {
@@ -503,11 +512,15 @@ const server = http.createServer((req, res) => {
         const apiKey=req.headers['x-api-key'];
         const provider=(req.headers['x-provider']||'anthropic').toLowerCase();
         const model=req.headers['x-model']||undefined;
-        const baseUrl=req.headers['x-base-url']||undefined;
+        const endpoint=req.headers['x-endpoint']||undefined;
+        const authStyle=req.headers['x-auth-style']||'bearer';
+        const extraHeaderName=req.headers['x-extra-header-name']||undefined;
+        const extraHeaderValue=req.headers['x-extra-header-value']||undefined;
+        const responseShape=req.headers['x-response-shape']||'openai';
         if(!apiKey){send('done',{success:false,error:'No API key.'});res.end();return;}
-        if(provider==='custom'&&!baseUrl){send('done',{success:false,error:'Custom provider selected but no base URL given.'});res.end();return;}
-        const llmOpts={provider,apiKey,model,baseUrl};
-        send('log',`Provider: ${provider}${model?` | Model: ${model}`:''}${baseUrl?` | Base URL: ${baseUrl}`:''}`);
+        if(provider==='custom'&&!endpoint){send('done',{success:false,error:'Custom provider selected but no endpoint URL given.'});res.end();return;}
+        const llmOpts={provider,apiKey,model,endpoint,authStyle,extraHeaderName,extraHeaderValue,responseShape};
+        send('log',`Provider: ${provider}${model?` | Model: ${model}`:''}${endpoint?` | Endpoint: ${endpoint}`:''}`);
 
         const {slug,source_urls=[]}=config;
         send('log',`Starting: ${config.product}`);
